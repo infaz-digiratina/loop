@@ -3,53 +3,177 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loop Returns Integration</title>
+  <title>Hubbed & Loop Returns Integration</title>
   <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f4f6f8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .card {
-      background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      text-align: center;
-      width: 400px;
-      max-width: 90%;
-    }
-    h1 { color: #333; }
-    button {
-      background-color: #0070f3;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #0056c1;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 15px;
-      color: #444;
-      white-space: pre-wrap;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2d2d2d 50%, #404040 75%, #595959 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.integration-card {
+  background: #ffffff;
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4), 
+              0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  padding: 50px 40px;
+  width: 420px;
+  max-width: 90%;
+  animation: fadeIn 0.6s ease;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  font-size: 1.75rem;
+  color: #000000;
+  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+p.subtitle {
+  color: #4a5568;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.logos-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  margin-top: 15px;
+  margin-bottom: 35px;
+}
+
+.logo-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-box svg, 
+.logo-box img {
+  display: block;
+  height: 55px;
+  width: auto;
+}
+
+.logo-title {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-align: center;
+  font-weight: 500;
+}
+
+button {
+  background: #000000;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  letter-spacing: 0.3px;
+}
+
+button:hover:not(:disabled) {
+  background-color: #1a1a1a;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+#status {
+  margin-top: 25px;
+  color: #374151;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+.success {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.error {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.loading {
+  color: #6b7280;
+  font-style: italic;
+}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Loop Returns Integration</h1>
-    <p>Click below to connect your Loop Returns account.</p>
+  <div class="integration-card">
+
+    
+<div class="logos-container">
+  <div class="logo-box">
+    <!-- Loop Returns Logo -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="150" height="50" viewBox="0 0 150 50">
+          <circle cx="25" cy="25" r="12" stroke="black" stroke-width="10" fill="white" />
+          <text x="55" y="32" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="bold" fill="black">
+            loop
+          </text>
+        </svg>
+        <div class="logo-title">Loop Returns</div>
+      </div>
+
+      <div class="logo-box">
+        <img src="https://dx7dzljysmt4v.cloudfront.net/assets/svgs/Parcelpoint_BLACK_BG_LOGO.svg" alt="Hubbed" />
+        <div class="logo-title">Hubbed</div>
+      </div>
+    </div>
+
+
+    <h1>Connect Hubbed with Loop Returns</h1>
+    <p class="subtitle">Seamlessly integrate your Loop Returns account with Hubbed.</p>
+
     <button id="installBtn">Install Integration</button>
     <div id="status"></div>
   </div>
@@ -62,16 +186,13 @@
     const statusDiv = document.getElementById("status");
     const installBtn = document.getElementById("installBtn");
 
-    // 💡 Generate a random requestId for tracing
     const requestId = crypto.randomUUID();
 
-    // 🧩 Step 1: If API key is present in URL, store it
     if (encryptedApiKey) {
       localStorage.setItem("loop_encrypted_key", encryptedApiKey);
-      console.log("Stored encrypted key in localStorage");
+      console.log("Stored encrypted key");
     }
 
-    // 🧩 Step 2: Retrieve stored key (used after redirect)
     const storedKey = localStorage.getItem("loop_encrypted_key");
 
     if (!storedKey) {
@@ -79,22 +200,22 @@
       installBtn.disabled = true;
     }
 
-    // 🚀 Step 3: Handle Install button click
     installBtn.addEventListener("click", () => {
       statusDiv.textContent = "Redirecting to Loop Returns...";
-      // Redirect to Loop’s installation entry
-      window.location.href = 
+      installBtn.disabled = true;
+      window.location.href =
         "https://admin.loopreturns.com/third-party-integration/install/8dcb066a-ee22-4fb0-b0a8-f5c473fe62ae";
     });
 
-    // 🔄 Step 4: Handle callback (after Loop OAuth)
     async function handleCallbackIfPresent() {
-      if (!shopId) return; // no callback params yet
+      if (!shopId) return;
 
-      statusDiv.textContent = `Mapping customer with shopId: ${shopId}...`;
+      statusDiv.textContent = `🔄 Mapping customer with Shop ID: ${shopId}...`;
+      statusDiv.className = "loading";
+      installBtn.disabled = true;
 
       try {
-        const mapUrl = "https://congeneric-collotypic-masako.ngrok-free.dev/auth-service/loop/oauth/map-customer";
+        const mapUrl = "https://api.qa.hubbedglobal.com/loop/oauth/map-customer";
         const response = await fetch(
           `${mapUrl}?requestId=${encodeURIComponent(requestId)}&customerApiKey=${encodeURIComponent(storedKey)}&shopId=${encodeURIComponent(shopId)}`,
           { method: "POST" }
@@ -103,15 +224,13 @@
         const data = await response.json();
 
         if (data.success) {
-          statusDiv.innerHTML = `✅ Integration successful!<br>Shop ID: <b>${shopId}</b>`;
-          //clear stored key after success
+          statusDiv.innerHTML = `✅ <span class="success">Integration Successful!</span><br>Shop ID: <b>${shopId}</b>`;
           localStorage.removeItem("loop_encrypted_key");
         } else {
-          statusDiv.innerHTML = `❌ Integration failed: ${data.message || "Unknown error"}`;
+          statusDiv.innerHTML = `❌ <span class="error">Integration Failed:</span> ${data.message || "Unknown error"}`;
         }
       } catch (err) {
-        console.error(err);
-        statusDiv.innerHTML = `❌ Error calling map-customer endpoint: ${err.message}`;
+        statusDiv.innerHTML = `❌ <span class="error">Error:</span> ${err.message}`;
       }
     }
 
