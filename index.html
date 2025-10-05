@@ -104,8 +104,8 @@
 
         if (data.success) {
           statusDiv.innerHTML = `✅ Integration successful!<br>Shop ID: <b>${shopId}</b>`;
-          // optional: clear stored key after success
-          // localStorage.removeItem("loop_encrypted_key");
+          //clear stored key after success
+          localStorage.removeItem("loop_encrypted_key");
         } else {
           statusDiv.innerHTML = `❌ Integration failed: ${data.message || "Unknown error"}`;
         }
