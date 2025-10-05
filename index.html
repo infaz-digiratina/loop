@@ -55,54 +55,63 @@
   </div>
 
   <script>
-    // 🧩 Read encrypted API key from URL (example: ?key=ENCRYPTED_API_KEY)
     const urlParams = new URLSearchParams(window.location.search);
     const encryptedApiKey = urlParams.get("key");
+    const shopId = urlParams.get("shopId");
+    const org = urlParams.get("org");
     const statusDiv = document.getElementById("status");
-
-    if (!encryptedApiKey) {
-      statusDiv.textContent = "Missing API key. Please use the provided integration link.";
-      document.getElementById("installBtn").disabled = true;
-    }
+    const installBtn = document.getElementById("installBtn");
 
     // 💡 Generate a random requestId for tracing
     const requestId = crypto.randomUUID();
 
-    // 1️⃣ Step 1: On button click → Redirect user to Loop install URL
-    document.getElementById("installBtn").addEventListener("click", () => {
+    // 🧩 Step 1: If API key is present in URL, store it
+    if (encryptedApiKey) {
+      localStorage.setItem("loop_encrypted_key", encryptedApiKey);
+      console.log("Stored encrypted key in localStorage");
+    }
+
+    // 🧩 Step 2: Retrieve stored key (used after redirect)
+    const storedKey = localStorage.getItem("loop_encrypted_key");
+
+    if (!storedKey) {
+      statusDiv.textContent = "❌ Missing API key. Please use the provided integration link.";
+      installBtn.disabled = true;
+    }
+
+    // 🚀 Step 3: Handle Install button click
+    installBtn.addEventListener("click", () => {
       statusDiv.textContent = "Redirecting to Loop Returns...";
-      // ⚠️ This must redirect (not fetch) to avoid CORS
-      window.location.href =
+      // Redirect to Loop’s installation entry
+      window.location.href = 
         "https://admin.loopreturns.com/third-party-integration/install/8dcb066a-ee22-4fb0-b0a8-f5c473fe62ae";
     });
 
-    // 2️⃣ Step 2: Detect callback with shopId after redirect
-    // After the OAuth flow, Loop will redirect to your backend callback
-    // which will return JSON like { success: true, shopId: "...", message: "..." }
-    // You can handle that callback page to redirect back here with shopId as a param
-
+    // 🔄 Step 4: Handle callback (after Loop OAuth)
     async function handleCallbackIfPresent() {
-      // e.g. http://example.com/loop-integration.html?key=XXX&shopId=YYY
-      const shopId = urlParams.get("shopId");
-      if (!shopId) return; // no callback yet
+      if (!shopId) return; // no callback params yet
 
-      statusDiv.textContent = "Mapping customer with shopId: " + shopId + "...";
+      statusDiv.textContent = `Mapping customer with shopId: ${shopId}...`;
 
       try {
-        const mapUrl = "http://localhost:8082/auth-service/loop/oauth/map-customer";
-        const response = await fetch(`${mapUrl}?requestId=${requestId}&customerApiKey=${encodeURIComponent(encryptedApiKey)}&shopId=${encodeURIComponent(shopId)}`, {
-          method: "POST",
-        });
+        const mapUrl = "https://congeneric-collotypic-masako.ngrok-free.dev/auth-service/loop/oauth/map-customer";
+        const response = await fetch(
+          `${mapUrl}?requestId=${encodeURIComponent(requestId)}&customerApiKey=${encodeURIComponent(storedKey)}&shopId=${encodeURIComponent(shopId)}`,
+          { method: "POST" }
+        );
 
         const data = await response.json();
+
         if (data.success) {
-          statusDiv.innerHTML = "✅ Integration successful!<br>Shop ID: " + shopId;
+          statusDiv.innerHTML = `✅ Integration successful!<br>Shop ID: <b>${shopId}</b>`;
+          // optional: clear stored key after success
+          // localStorage.removeItem("loop_encrypted_key");
         } else {
-          statusDiv.innerHTML = "❌ Integration failed: " + (data.message || "Unknown error");
+          statusDiv.innerHTML = `❌ Integration failed: ${data.message || "Unknown error"}`;
         }
       } catch (err) {
         console.error(err);
-        statusDiv.innerHTML = "❌ Error calling map-customer endpoint: " + err.message;
+        statusDiv.innerHTML = `❌ Error calling map-customer endpoint: ${err.message}`;
       }
     }
 
