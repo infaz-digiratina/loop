@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hubbed & Loop Returns Integration</title>
-  <style>
+<style>
 * {
   margin: 0;
   padding: 0;
@@ -36,46 +36,46 @@ body::before {
 
 .integration-card {
   background: #ffffff;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(15px);
   border-radius: 16px;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4), 
-              0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35),
+              0 8px 20px rgba(0, 0, 0, 0.2);
   text-align: center;
-  padding: 50px 40px;
-  width: 420px;
+  padding: 30px 30px;
+  width: 400px;
   max-width: 90%;
-  animation: fadeIn 0.6s ease;
+  animation: fadeIn 0.5s ease;
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(25px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 h1 {
-  font-size: 1.75rem;
-  color: #000000;
-  margin-bottom: 12px;
+  font-size: 1.6rem;
+  color: #111;
+  margin-bottom: 10px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
 
 p.subtitle {
   color: #4a5568;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .logos-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 40px;
-  margin-top: 15px;
-  margin-bottom: 35px;
+  gap: 35px;
+  margin-top: 10px;
+  margin-bottom: 25px;
 }
 
 .logo-box {
@@ -87,25 +87,25 @@ p.subtitle {
 .logo-box svg, 
 .logo-box img {
   display: block;
-  height: 55px;
+  height: 50px;
   width: auto;
 }
 
 .logo-title {
-  margin-top: 10px;
-  font-size: 0.9rem;
+  margin-top: 8px;
+  font-size: 0.85rem;
   color: #6b7280;
   text-align: center;
   font-weight: 500;
 }
 
 button {
-  background: #000000;
+  background: #000;
   color: white;
   border: none;
-  padding: 14px 28px;
+  padding: 12px 24px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -116,7 +116,7 @@ button {
 button:hover:not(:disabled) {
   background-color: #1a1a1a;
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
 }
 
 button:disabled {
@@ -126,7 +126,7 @@ button:disabled {
 }
 
 #status {
-  margin-top: 25px;
+  margin-top: 20px;
   color: #374151;
   font-size: 15px;
   white-space: pre-wrap;
@@ -144,9 +144,32 @@ button:disabled {
 
 .loading {
   color: #6b7280;
-  font-style: italic;
+  font-style: normal; 
 }
-  </style>
+
+/* Refine integration message */
+#status div {
+  margin-top: 15px;
+}
+
+#status p {
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.status-message {
+  margin: 0;
+  /* padding-top: 10px; */
+  text-align: center;
+}
+
+.status-message p {
+  margin: 5px 0 0 0;
+  line-height: 1.4;
+}
+
+</style>
+
 </head>
 <body>
   <div class="integration-card">
@@ -178,63 +201,96 @@ button:disabled {
     <div id="status"></div>
   </div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const encryptedApiKey = urlParams.get("key");
-    const shopId = urlParams.get("shopId");
-    const org = urlParams.get("org");
-    const statusDiv = document.getElementById("status");
-    const installBtn = document.getElementById("installBtn");
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const encryptedApiKey = urlParams.get("key");
+  const shopId = urlParams.get("shopId");
+  const org = urlParams.get("org");
+  const statusDiv = document.getElementById("status");
+  const installBtn = document.getElementById("installBtn");
 
-    const requestId = crypto.randomUUID();
+  const requestId = crypto.randomUUID();
 
-    if (encryptedApiKey) {
-      localStorage.setItem("loop_encrypted_key", encryptedApiKey);
-      console.log("Stored encrypted key");
-    }
+  // Store the encrypted key if present
+  if (encryptedApiKey) {
+    localStorage.setItem("loop_encrypted_key", encryptedApiKey);
+    console.log("Stored encrypted key");
+  }
 
-    const storedKey = localStorage.getItem("loop_encrypted_key");
+  const storedKey = localStorage.getItem("loop_encrypted_key");
 
-    if (!storedKey) {
-      statusDiv.textContent = "❌ Missing API key. Please use the provided integration link.";
-      installBtn.disabled = true;
-    }
+  // Disable button if key missing
+  if (!storedKey) {
+    statusDiv.textContent =
+      "Missing API key. Please use the provided integration link.";
+    installBtn.disabled = true;
+  }
 
-    installBtn.addEventListener("click", () => {
-      statusDiv.textContent = "Redirecting to Loop Returns...";
-      installBtn.disabled = true;
-      window.location.href =
-        "https://admin.loopreturns.com/third-party-integration/install/8dcb066a-ee22-4fb0-b0a8-f5c473fe62ae";
-    });
+  //Handle Install click
+  installBtn.addEventListener("click", () => {
+    statusDiv.textContent = "Redirecting to Loop Returns...";
+    installBtn.disabled = true;
+    window.location.href =
+      "https://admin.loopreturns.com/third-party-integration/install/8dcb066a-ee22-4fb0-b0a8-f5c473fe62ae";
+  });
 
-    async function handleCallbackIfPresent() {
-      if (!shopId) return;
+  // Handle callback after OAuth
+  async function handleCallbackIfPresent() {
+    if (!shopId) return;
 
-      statusDiv.textContent = `🔄 Mapping customer with Shop ID: ${shopId}...`;
-      statusDiv.className = "loading";
-      installBtn.disabled = true;
+    statusDiv.textContent = "Connecting your Hubbed and Loop Returns accounts...";
+    statusDiv.className = "loading";
+    installBtn.disabled = true;
 
-      try {
-        const mapUrl = "https://api.qa.hubbedglobal.com/loop/oauth/map-customer";
-        const response = await fetch(
-          `${mapUrl}?requestId=${encodeURIComponent(requestId)}&customerApiKey=${encodeURIComponent(storedKey)}&shopId=${encodeURIComponent(shopId)}`,
-          { method: "POST" }
-        );
+    try {
+      const mapUrl =
+        "https://api.qa.hubbedglobal.com/loop/oauth/map-customer";
+      const response = await fetch(
+        `${mapUrl}?requestId=${encodeURIComponent(
+          requestId
+        )}&customerApiKey=${encodeURIComponent(
+          storedKey
+        )}&shopId=${encodeURIComponent(shopId)}`,
+        { method: "POST" }
+      );
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.success) {
-          statusDiv.innerHTML = `✅ <span class="success">Integration Successful!</span><br>Shop ID: <b>${shopId}</b>`;
-          localStorage.removeItem("loop_encrypted_key");
-        } else {
-          statusDiv.innerHTML = `❌ <span class="error">Integration Failed:</span> ${data.message || "Unknown error"}`;
-        }
-      } catch (err) {
-        statusDiv.innerHTML = `❌ <span class="error">Error:</span> ${err.message}`;
+      if (data.success) {
+        // Success handling
+        localStorage.removeItem("loop_encrypted_key");
+        installBtn.style.display = "none";
+
+        statusDiv.innerHTML = `
+        <div class="status-message success">
+          <strong>Integration Successful</strong>
+          <p>Your Hubbed and Loop Returns accounts are now connected.</p>
+        </div>
+        `;
+      } else {
+        statusDiv.innerHTML = `
+          <div class="status-message error">
+            <strong>Integration Failed</strong>
+             <!-- <p>${data.message || "An unknown error occurred. Please try again."}</p> -->
+          </div>
+        `;
+        installBtn.disabled = false;
+        console.error("Integration error:", data.message);
       }
+    } catch (err) {
+      statusDiv.innerHTML = `
+        <div class="status-message error">
+          <strong>Error Occurred</strong>
+          <!-- <p>${err.message}</p>  -->
+        </div>
+      `;
+      installBtn.disabled = false;
+      console.error("Fetch error:", err);
     }
+  }
 
-    handleCallbackIfPresent();
-  </script>
+  handleCallbackIfPresent();
+</script>
+
 </body>
 </html>
