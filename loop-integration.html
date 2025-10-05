@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loop Returns Integration</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 400px;
+      max-width: 90%;
+    }
+    h1 { color: #333; }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056c1;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #444;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Loop Returns Integration</h1>
+    <p>Click below to connect your Loop Returns account.</p>
+    <button id="installBtn">Install Integration</button>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    // 🧩 Read encrypted API key from URL (example: ?key=ENCRYPTED_API_KEY)
+    const urlParams = new URLSearchParams(window.location.search);
+    const encryptedApiKey = urlParams.get("key");
+    const statusDiv = document.getElementById("status");
+
+    if (!encryptedApiKey) {
+      statusDiv.textContent = "Missing API key. Please use the provided integration link.";
+      document.getElementById("installBtn").disabled = true;
+    }
+
+    // 💡 Generate a random requestId for tracing
+    const requestId = crypto.randomUUID();
+
+    // 1️⃣ Step 1: On button click → Redirect user to Loop install URL
+    document.getElementById("installBtn").addEventListener("click", () => {
+      statusDiv.textContent = "Redirecting to Loop Returns...";
+      // ⚠️ This must redirect (not fetch) to avoid CORS
+      window.location.href =
+        "https://admin.loopreturns.com/third-party-integration/install/8dcb066a-ee22-4fb0-b0a8-f5c473fe62ae";
+    });
+
+    // 2️⃣ Step 2: Detect callback with shopId after redirect
+    // After the OAuth flow, Loop will redirect to your backend callback
+    // which will return JSON like { success: true, shopId: "...", message: "..." }
+    // You can handle that callback page to redirect back here with shopId as a param
+
+    async function handleCallbackIfPresent() {
+      // e.g. http://example.com/loop-integration.html?key=XXX&shopId=YYY
+      const shopId = urlParams.get("shopId");
+      if (!shopId) return; // no callback yet
+
+      statusDiv.textContent = "Mapping customer with shopId: " + shopId + "...";
+
+      try {
+        const mapUrl = "http://localhost:8082/auth-service/loop/oauth/map-customer";
+        const response = await fetch(`${mapUrl}?requestId=${requestId}&customerApiKey=${encodeURIComponent(encryptedApiKey)}&shopId=${encodeURIComponent(shopId)}`, {
+          method: "POST",
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          statusDiv.innerHTML = "✅ Integration successful!<br>Shop ID: " + shopId;
+        } else {
+          statusDiv.innerHTML = "❌ Integration failed: " + (data.message || "Unknown error");
+        }
+      } catch (err) {
+        console.error(err);
+        statusDiv.innerHTML = "❌ Error calling map-customer endpoint: " + err.message;
+      }
+    }
+
+    handleCallbackIfPresent();
+  </script>
+</body>
+</html>
